@@ -1,0 +1,54 @@
+graph TD
+    subgraph Central Knowledge Store
+        direction LR
+        AP[attack_pool]
+        VR[vuln_reports]
+        LD[labeled_data]
+        M[models]
+    end
+
+    subgraph Workflow
+        direction LR
+        WP1("WP1-1: Intelligence<br>Gathering")
+        WP2("WP1-2: Adversarial<br>Detection")
+        WP3("WP1-3: Sandbox<br>Simulation")
+        WP4("WP1-4: Intrusion<br>Detection")
+    end
+
+    subgraph "External Environment"
+        direction LR
+	    Internet([Internet/Network])
+    end
+
+
+    Internet -- Data Acquisition --> WP1
+    WP1 -- Structured Data --> AP
+
+    AP -- Reads --> WP2
+    WP2 -- Generates --> VR
+
+    VR -- Reads --> WP3
+    WP3 -- Generates --> LD
+
+    LD -- Reads --> WP4
+    WP4 -- Generates --> M
+    M -- "Generates<br>Improvement<br>Reports" --> AgentImprovement([Agent Improvement])
+
+
+    WP4-. Feedback & Iteration .->WP1
+
+    %% --- Styling ---
+    %% Subgraph Style
+    style CentralKnowledgeStore fill:#E1EDDC,stroke:#000000
+    
+    %% Node Style Definitions
+    classDef workflow fill:#639DD0,color:#ffffff,stroke:#000000,stroke-width:2px
+    classDef datastore fill:#FFC79A,color:#000000,stroke:#000000,stroke-width:2px
+    classDef external fill:#7CC1F3,color:#000000,stroke:#000000,stroke-width:2px
+    classDef output fill:#E1959A,color:#000000,stroke:#000000,stroke-width:2px
+
+    %% Applying Styles to Nodes
+    class WP1,WP2,WP3,WP4 workflow
+    class AP,VR,LD,M datastore
+    class Internet external
+    class AgentImprovement output

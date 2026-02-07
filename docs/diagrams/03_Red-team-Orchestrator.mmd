@@ -1,0 +1,38 @@
+graph TD
+    subgraph Red Team Simulation Module
+        Orchestrator["<b>Red Team Orchestrator</b><br>从 attack_pool 取攻击, 分派给专家"]
+
+        subgraph Attack Agents
+            direction LR
+            PIA["<b>Prompt Injection Agent</b><br>- 直接/间接注入<br>- 上下文操纵<br>- 指令覆盖"]
+            JA["<b>Jailbreak Agent</b><br>- DAN/越狱<br>- 角色扮演<br>- 编码绕过"]
+            ILA["<b>Info Leakage Agent</b><br>- 系统提示词提取<br>- 训练数据探测<br>- 配置信息泄露"]
+            MAA["<b>Multimodal Attack Agent</b><br>- 图像对抗样本<br>- 音频攻击<br>- 跨模态注入"]
+        end
+
+        subgraph Evaluation Agent
+            Judge["<b>Judge Agent (攻击评估者)</b><br>- 判定攻击是否成功<br>- CVSS 评分<br>- 生成修复建议"]
+        end
+
+        %% Control Flow: Orchestrator assigns tasks to Attack Agents
+        Orchestrator -- "分派攻击任务" --> PIA
+        Orchestrator -- "分派攻击任务" --> JA
+        Orchestrator -- "分派攻击任务" --> ILA
+        Orchestrator -- "分派攻击任务" --> MAA
+
+        %% Data Flow: Attack results are sent to the Judge Agent
+        PIA -- "攻击结果" --> Judge
+        JA -- "攻击结果" --> Judge
+        ILA -- "攻击结果" --> Judge
+        MAA -- "攻击结果" --> Judge
+    end
+
+    %% --- Styling Section ---
+    classDef orchestrator fill:#E1959A,color:#000000,stroke:#000000,stroke-width:2px
+    classDef attackAgent fill:#639DD0,color:#ffffff,stroke:#000000,stroke-width:2px
+    classDef judgeAgent fill:#FFC79A,color:#000000,stroke:#000000,stroke-width:2px
+
+    %% Applying Styles to Nodes
+    class Orchestrator orchestrator
+    class PIA,JA,ILA,MAA attackAgent
+    class Judge judgeAgent

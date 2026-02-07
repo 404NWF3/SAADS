@@ -1,0 +1,113 @@
+flowchart TB
+    %% ========================================
+    %% Core Architecture: Attack Knowledge Store
+    %% + 4 WP Agent Subsystems + Feedback Loop
+    %% Nature Journal Style
+    %% ========================================
+
+    %% --- Central Knowledge Store (Top) ---
+    subgraph KS ["Attack Knowledge Store"]
+        direction LR
+        AP["attack_pool\n攻击技术池\n(STIX 2.1)"]
+        VR["vuln_reports\n漏洞报告\n(CVSS)"]
+        LD["labeled_data\n标注数据集\n(JSONL)"]
+        MD["models\n防御模型\n(ONNX)"]
+    end
+
+    %% --- Four WP Agent Subsystems (Bottom Row) ---
+    subgraph WP1 ["WP1-1 情报采集"]
+        direction TB
+        W1_TITLE["Supervisor 架构"]
+        W1A["Web Crawler\nCVE / NVD / GitHub"]
+        W1B["Paper Analyzer\narXiv / PoC"]
+        W1C["Dark Web Agent\n论坛 / Telegram"]
+        W1D["Standardizer\nSTIX 2.1 标准化"]
+        W1_TITLE ~~~ W1A
+        W1_TITLE ~~~ W1B
+        W1_TITLE ~~~ W1C
+        W1A --> W1D
+        W1B --> W1D
+        W1C --> W1D
+    end
+
+    subgraph WP2 ["WP1-2 对抗检测"]
+        direction TB
+        W2_TITLE["Supervisor 架构"]
+        W2A["Prompt Injection\n直接/间接注入"]
+        W2B["Jailbreak\nDAN / 角色扮演"]
+        W2C["Info Leakage\n提示词 / 数据泄露"]
+        W2D["Multimodal\n图像 / 音频攻击"]
+        W2E["Judge Agent\nCVSS 评分 + 修复建议"]
+        W2_TITLE ~~~ W2A
+        W2_TITLE ~~~ W2B
+        W2A --> W2E
+        W2B --> W2E
+        W2C --> W2E
+        W2D --> W2E
+    end
+
+    subgraph WP3 ["WP1-3 沙盒模拟"]
+        direction TB
+        W3_TITLE["Pipeline 架构"]
+        W3A["Env Manager\nDocker 隔离"]
+        W3B["Payload Mutator\n变异生成"]
+        W3C["Sandboxed Executor\n隔离执行"]
+        W3D["Data Collector\nPCAP / 日志"]
+        W3E["Labeler\n自动标注"]
+        W3_TITLE ~~~ W3A
+        W3A --> W3B --> W3C --> W3D --> W3E
+    end
+
+    subgraph WP4 ["WP1-4 入侵检测"]
+        direction TB
+        W4_TITLE["Pipeline 架构"]
+        W4A["Data Loader\n特征工程"]
+        W4B["Meta-Learning\n模型选择器"]
+        W4C["Trainer\nML / GAN / 增量"]
+        W4D["Evaluator\nF1 / SHAP"]
+        W4E["Deployer\nAPI 防火墙"]
+        W4_TITLE ~~~ W4A
+        W4A --> W4B --> W4C --> W4D --> W4E
+    end
+
+    %% --- Data Flows: Knowledge Store <-> WP Agents ---
+    W1D ==>|"写入"| AP
+    AP ==>|"读取攻击模板"| W2A
+    AP ==>|"读取攻击模板"| W2B
+    AP ==>|"读取攻击模板"| W2C
+    AP ==>|"读取攻击模板"| W2D
+    W2E ==>|"写入"| VR
+    VR ==>|"读取漏洞报告"| W3A
+    W3E ==>|"写入"| LD
+    LD ==>|"读取标注数据"| W4A
+    W4E ==>|"写入"| MD
+
+    %% --- Feedback Loop ---
+    MD -.->|"防御模型反馈"| W1_TITLE
+    W4E -.->|"红蓝对抗\n持续迭代"| W1A
+
+    %% --- Styles ---
+    classDef ksBox fill:#E8EEF4,stroke:#3B6FA0,stroke-width:2px,color:#1B3A5C,font-weight:bold
+    classDef ksNode fill:#D4E4F7,stroke:#3B6FA0,stroke-width:1.5px,color:#1B3A5C,font-weight:bold
+    classDef wp1Box fill:#E3F2E1,stroke:#4A8C3F,stroke-width:2px,color:#2D5A27,font-weight:bold
+    classDef wp1Node fill:#D0EACC,stroke:#4A8C3F,stroke-width:1px,color:#2D5A27
+    classDef wp2Box fill:#FDE8D0,stroke:#C67B30,stroke-width:2px,color:#7A4A16,font-weight:bold
+    classDef wp2Node fill:#FCDCB8,stroke:#C67B30,stroke-width:1px,color:#7A4A16
+    classDef wp3Box fill:#E8E0F0,stroke:#7B5EA7,stroke-width:2px,color:#4A3366,font-weight:bold
+    classDef wp3Node fill:#DCD2EA,stroke:#7B5EA7,stroke-width:1px,color:#4A3366
+    classDef wp4Box fill:#DCE9F2,stroke:#3B7EA1,stroke-width:2px,color:#1E4D6E,font-weight:bold
+    classDef wp4Node fill:#C8DDE9,stroke:#3B7EA1,stroke-width:1px,color:#1E4D6E
+    classDef titleNode fill:none,stroke:none,color:#555555,font-weight:bold,font-size:11px
+
+    class AP,VR,LD,MD ksNode
+    class W1A,W1B,W1C,W1D wp1Node
+    class W2A,W2B,W2C,W2D,W2E wp2Node
+    class W3A,W3B,W3C,W3D,W3E wp3Node
+    class W4A,W4B,W4C,W4D,W4E wp4Node
+    class W1_TITLE,W2_TITLE,W3_TITLE,W4_TITLE titleNode
+
+    style KS fill:#E8EEF4,stroke:#3B6FA0,stroke-width:2.5px,color:#1B3A5C,font-weight:bold
+    style WP1 fill:#F0F8EE,stroke:#4A8C3F,stroke-width:2px,color:#2D5A27
+    style WP2 fill:#FFF5EB,stroke:#C67B30,stroke-width:2px,color:#7A4A16
+    style WP3 fill:#F3EEF8,stroke:#7B5EA7,stroke-width:2px,color:#4A3366
+    style WP4 fill:#EBF3F8,stroke:#3B7EA1,stroke-width:2px,color:#1E4D6E
