@@ -6,7 +6,7 @@
 
 ## 核心架构
 
-![系统架构图](./assets/01_cyber_defense_pipeline.svg)
+![系统架构图](./assets/01_cyber_defense_pipeline.png)
 
 | 智能体 | 编号 | 角色定位 | 服务团队 |
 |--------|------|----------|----------|
