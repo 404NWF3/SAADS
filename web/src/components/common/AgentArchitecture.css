@@ -1,0 +1,209 @@
+.agent-architecture {
+  margin: 0;
+  font-family: var(--font-sans);
+}
+
+.architecture-reason {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 247, 250, 0.95) 100%);
+  border-radius: 8px;
+  border-left: 3px solid currentColor;
+  line-height: 1.5;
+  font-style: italic;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  position: relative;
+  overflow: hidden;
+}
+
+.architecture-reason::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, currentColor, transparent);
+  opacity: 0.3;
+}
+
+.architecture-svg {
+  width: 100%;
+  height: auto;
+  margin-bottom: 0;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.06));
+}
+
+.supervisor-svg {
+  max-height: 380px;
+}
+
+.pipeline-svg {
+  max-height: 200px;
+}
+
+.arch-node {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.arch-node:hover {
+  transform: scale(1.08);
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.2));
+}
+
+.supervisor-node {
+  animation: supervisorPulse 3s ease-in-out infinite;
+}
+
+@keyframes supervisorPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+.node-text {
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  pointer-events: none;
+}
+
+.node-text-small {
+  font-size: 11px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  pointer-events: none;
+}
+
+.architecture-components {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.component-item {
+  padding: var(--spacing-md);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%);
+  border: 1px solid var(--border-primary);
+  border-radius: 10px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.component-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, currentColor, transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.component-item::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: radial-gradient(circle at top right, currentColor, transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.component-item:hover {
+  background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+  border-color: currentColor;
+  transform: translateX(6px) translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.component-item:hover::before {
+  opacity: 1;
+}
+
+.component-item:hover::after {
+  opacity: 0.03;
+}
+
+.component-name {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+}
+
+.component-name::before {
+  content: '▸';
+  font-size: 12px;
+  opacity: 0.6;
+  transition: transform 0.3s ease;
+}
+
+.component-item:hover .component-name::before {
+  transform: translateX(3px);
+}
+
+.component-role {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  line-height: 1.5;
+  position: relative;
+  z-index: 1;
+}
+
+.component-tools {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.04) 0%, rgba(0, 0, 0, 0.02) 100%);
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  position: relative;
+  z-index: 1;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 768px) {
+  .architecture-svg {
+    max-height: 300px;
+  }
+
+  .supervisor-svg {
+    max-height: 350px;
+  }
+
+  .pipeline-svg {
+    max-height: 180px;
+  }
+
+  .node-text {
+    font-size: 11px;
+  }
+
+  .node-text-small {
+    font-size: 9px;
+  }
+
+  .architecture-components {
+    grid-template-columns: 1fr;
+  }
+}

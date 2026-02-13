@@ -1,0 +1,61 @@
+.tech-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  background: white;
+  border: 1px solid var(--badge-color, var(--border-primary));
+  border-radius: var(--radius-sm);
+  font-size: 10px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  color: var(--badge-color, var(--text-primary));
+  transition: all var(--transition-fast);
+  cursor: default;
+}
+
+.tech-badge:hover {
+  background: var(--badge-color);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.tech-badge-icon {
+  font-size: 11px;
+  line-height: 1;
+}
+
+.tech-badge-title {
+  line-height: 1;
+}
+
+.tech-badge-architecture {
+  border-color: #2D3E8C;
+  color: #2D3E8C;
+}
+
+.tech-badge-architecture:hover {
+  background: #2D3E8C;
+  color: white;
+}
+
+.tech-badge-technology {
+  border-color: #B5600A;
+  color: #B5600A;
+}
+
+.tech-badge-technology:hover {
+  background: #B5600A;
+  color: white;
+}
+
+.tech-badge-capability {
+  border-color: #1A6B5A;
+  color: #1A6B5A;
+}
+
+.tech-badge-capability:hover {
+  background: #1A6B5A;
+  color: white;
+}
