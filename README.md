@@ -146,7 +146,7 @@ WP1-3 和 WP1-4 在用户接入系统后才开始工作。WP1-3 接入用户应�
 - Orchestrator 需要从 attack_pool **按策略选择** 攻击任务, 而非让 Agent 自行决定
 - 攻击覆盖率 (OWASP LLM Top 10) 需要 Orchestrator 统一追踪
 
-![渗透测试智能体架构图](./assets/03_Red-team-Orchestrator.svg)
+<!-- ![渗透测试智能体架构图](./assets/03_Red-team-Orchestrator.svg) -->
 
 **关键能力**:
 
