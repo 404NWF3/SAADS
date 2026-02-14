@@ -16,3 +16,5 @@
 /data/vuln_reports/*.json
 /data/bom_knowledge/*.json
 /data/logs/*.log
+
+/chat-history/
