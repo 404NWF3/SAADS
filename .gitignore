@@ -5,4 +5,14 @@
 /.venv/
 
 /__pycache__/
+**/__pycache__/
+*.pyc
 .python-version
+
+# 运行时数据（只保留 .gitkeep）
+/data/attack_pool/*.json
+/data/test_scripts/**/*.json
+/data/test_scripts/**/*.py
+/data/vuln_reports/*.json
+/data/bom_knowledge/*.json
+/data/logs/*.log
