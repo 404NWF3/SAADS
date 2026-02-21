@@ -46,31 +46,6 @@ logger = setup_logger("wp1_1.graph")
 
 
 # ---------------------------------------------------------------------------
-# 合并节点: 将 3 个 collector 的 raw_intel 合并
-# ---------------------------------------------------------------------------
-
-
-async def merge_raw_intel_node(state: IntelState) -> dict:
-    """
-    合并多个采集 Agent 的结果。
-
-    由于 LangGraph 使用列表追加语义 (add_messages 模式),
-    raw_intel 已经由各节点自动合并。此节点只做日志记录。
-    """
-    raw_intel = state.get("raw_intel", [])
-    logger.info("Merge: total raw_intel = %d items", len(raw_intel))
-
-    # 按 source_type 统计
-    by_source: dict[str, int] = {}
-    for item in raw_intel:
-        src = item.get("_source_type", "unknown")
-        by_source[src] = by_source.get(src, 0) + 1
-
-    logger.info("Merge: by source = %s", by_source)
-    return {}  # 不修改 state, raw_intel 已由上游节点合并
-
-
-# ---------------------------------------------------------------------------
 # 图构建
 # ---------------------------------------------------------------------------
 

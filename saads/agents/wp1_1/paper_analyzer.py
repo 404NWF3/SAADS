@@ -17,6 +17,7 @@ WP1-1 Paper Analyzer Agent — 搜索并解析 AI 安全学术论文。
 from __future__ import annotations
 
 import json
+import time
 
 from langchain_core.messages import HumanMessage
 
@@ -110,7 +111,11 @@ async def paper_analyzer_node(state: IntelState) -> dict:
     llm = get_fast_llm()
     raw_intel: list[dict] = []
 
-    for query in queries[:3]:  # 最多搜索 3 个查询
+    for i, query in enumerate(queries[:3]):  # 最多搜索 3 个查询
+        # arXiv 礼貌性要求: 请求间隔 >= 3 秒，避免触发 429 限速
+        if i > 0:
+            time.sleep(3)
+
         logger.info("arXiv: searching '%s'", query)
 
         try:

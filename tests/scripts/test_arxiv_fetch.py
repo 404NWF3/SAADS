@@ -13,9 +13,14 @@
 预期输出:
   - 搜索 "prompt injection attack LLM" 相关的论文列表
   - 每条包含: 标题、作者、分类、发布日期、摘要
+
+注意:
+  - arXiv 要求请求间隔 >= 3 秒，本脚本已内置延迟。
+  - 连续快速测试会触发 429 限速；_search_arxiv_impl 内部有重试机制。
 """
 
 import sys
+import time
 from pathlib import Path
 
 project_root = Path(__file__).resolve().parent.parent.parent
@@ -25,63 +30,90 @@ import json
 from saads.tools.api_tools import _search_arxiv_impl
 
 
+def _print_papers(data: list, label: str) -> None:
+    print(f"找到 {len(data)} 篇论文\n")
+    for i, paper in enumerate(data, 1):
+        print(f"  [{i}] {paper.get('title', 'N/A')}")
+        authors = paper.get("authors", [])
+        if authors:
+            author_str = ", ".join(authors[:3])
+            if len(authors) > 3:
+                author_str += f" et al. ({len(authors)} authors)"
+            print(f"      作者: {author_str}")
+        cats = paper.get("categories", [])
+        if cats:
+            print(f"      分类: {', '.join(cats)}")
+        print(f"      发布: {paper.get('published', 'N/A')[:10]}")
+        print(f"      链接: {paper.get('url', 'N/A')}")
+        summary = paper.get("summary", "")
+        if summary:
+            print(f"      摘要: {summary[:150]}...")
+        print()
+
+
+def run_test(label: str, query: str, max_results: int) -> bool:
+    """Run a single arXiv search test. Returns True on success."""
+    print(f"--- {label} ---")
+    print(f"    查询: {query!r}")
+    result = _search_arxiv_impl(query, max_results=max_results)
+
+    if result.startswith("Error"):
+        print(f"[FAIL] {result}\n")
+        return False
+
+    try:
+        data = json.loads(result)
+    except json.JSONDecodeError as exc:
+        print(f"[FAIL] JSON decode error: {exc}")
+        print(f"       Raw response (first 500 chars): {result[:500]}\n")
+        return False
+
+    if not isinstance(data, list):
+        print(f"[FAIL] Unexpected result type: {type(data)}")
+        print(f"       Raw: {result[:500]}\n")
+        return False
+
+    _print_papers(data, label)
+    print(f"[OK] {label} passed\n")
+    return True
+
+
 def main():
     print("=" * 60)
     print("SAADS — arXiv 论文搜索验证")
     print("=" * 60)
-    print("\n[INFO] arXiv API 无需配置，直接使用\n")
+    print("\n[INFO] arXiv API 无需配置，直接使用")
+    print("[INFO] 请求间隔 3 秒（arXiv 礼貌性要求）\n")
 
-    # --- 测试 1: 搜索提示词注入相关论文 ---
-    print("--- 测试 1: 搜索 'prompt injection attack LLM' ---")
-    result = _search_arxiv_impl("prompt injection attack LLM", max_results=5)
+    tests = [
+        # (label, query, max_results)
+        (
+            "测试 1: 搜索 'prompt injection attack LLM' (plain keywords)",
+            "prompt injection attack LLM",
+            5,
+        ),
+        (
+            "测试 2: 搜索 jailbreak (arXiv operator syntax)",
+            'all:jailbreak AND all:"language model"',
+            3,
+        ),
+        (
+            "测试 3: 搜索 adversarial multimodal (arXiv operator syntax)",
+            'all:adversarial AND all:multimodal AND all:"language model"',
+            3,
+        ),
+    ]
 
-    try:
-        data = json.loads(result)
-        if isinstance(data, list):
-            print(f"找到 {len(data)} 篇论文\n")
-            for i, paper in enumerate(data, 1):
-                print(f"  [{i}] {paper.get('title', 'N/A')}")
-                authors = paper.get("authors", [])
-                if authors:
-                    author_str = ", ".join(authors[:3])
-                    if len(authors) > 3:
-                        author_str += f" et al. ({len(authors)} authors)"
-                    print(f"      作者: {author_str}")
-                cats = paper.get("categories", [])
-                if cats:
-                    print(f"      分类: {', '.join(cats)}")
-                print(f"      发布: {paper.get('published', 'N/A')[:10]}")
-                print(f"      链接: {paper.get('url', 'N/A')}")
-                summary = paper.get("summary", "")
-                if summary:
-                    print(f"      摘要: {summary[:150]}...")
-                print()
-        else:
-            print(f"返回结果: {result[:500]}")
-    except json.JSONDecodeError:
-        print(f"返回非 JSON 结果: {result[:500]}")
-
-    # --- 测试 2: 搜索越狱攻击论文 ---
-    print("--- 测试 2: 搜索 'jailbreak large language model' ---")
-    result2 = _search_arxiv_impl("jailbreak large language model", max_results=3)
-
-    try:
-        data2 = json.loads(result2)
-        if isinstance(data2, list):
-            print(f"找到 {len(data2)} 篇论文\n")
-            for i, paper in enumerate(data2, 1):
-                print(f"  [{i}] {paper.get('title', 'N/A')}")
-                print(
-                    f"      发布: {paper.get('published', 'N/A')[:10]} | 分类: {', '.join(paper.get('categories', [])[:2])}"
-                )
-                print()
-        else:
-            print(f"返回结果: {result2[:500]}")
-    except json.JSONDecodeError:
-        print(f"返回非 JSON 结果: {result2[:500]}")
+    passed = 0
+    for idx, (label, query, max_results) in enumerate(tests):
+        if idx > 0:
+            print("[INFO] Sleeping 3 s between requests (arXiv rate limit)...\n")
+            time.sleep(3)
+        if run_test(label, query, max_results):
+            passed += 1
 
     print("=" * 60)
-    print("arXiv API 验证完成!")
+    print(f"arXiv API 验证完成: {passed}/{len(tests)} 测试通过")
     print("=" * 60)
 
 

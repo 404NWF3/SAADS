@@ -601,9 +601,23 @@ def _search_arxiv_impl(query: str, max_results: int = 10) -> str:
         and multi-word quoted phrases are preserved.
         e.g. 'prompt injection LLM' -> 'all:"prompt injection" AND all:LLM'
              (caller can also pass pre-formatted queries)
+
+    Rate-limit handling:
+      - arXiv recommends >= 3 s between requests; callers should enforce this.
+      - On HTTP 429 the function retries up to 3 times with exponential backoff
+        (6 s, 12 s, 24 s).
+
+    URL-encoding note:
+      - httpx would double-encode a pre-formatted query string if passed via the
+        `params` dict (quotes become %2522, spaces become +).  We therefore build
+        the query URL manually using urllib so that arXiv operators and quoted
+        phrases (e.g. all:"prompt injection") are encoded exactly once and
+        correctly.
     """
     import httpx
     import re
+    import time
+    import urllib.parse
 
     # Check if query already uses arXiv search syntax
     has_operators = any(
@@ -613,11 +627,9 @@ def _search_arxiv_impl(query: str, max_results: int = 10) -> str:
     if has_operators:
         search_query = query
     else:
-        # Build a proper AND query from plain keywords
-        # Preserve quoted phrases, AND the rest as individual terms
-        # Split on quoted phrases first, then tokenize unquoted parts
+        # Build a proper AND query from plain keywords.
+        # Preserve quoted phrases; wrap each token/phrase in all:
         parts = []
-        # Extract quoted phrases
         tokens = re.findall(r'"[^"]+"|[\S]+', query)
         for token in tokens:
             if token.startswith('"'):
@@ -626,81 +638,114 @@ def _search_arxiv_impl(query: str, max_results: int = 10) -> str:
                 parts.append(f"all:{token}")
         search_query = " AND ".join(parts)
 
-    url = "https://export.arxiv.org/api/query"
-    params = {
-        "search_query": search_query,
-        "start": 0,
-        "max_results": min(max_results, 30),
-        "sortBy": "lastUpdatedDate",
-        "sortOrder": "descending",
-    }
+    # Build the URL manually so quoted phrases are encoded correctly.
+    # urllib.parse.urlencode with quote_via=quote encodes spaces as %20 and
+    # preserves double-quotes as %22, which arXiv handles correctly.
+    base_url = "https://export.arxiv.org/api/query"
+    qs = urllib.parse.urlencode(
+        {
+            "search_query": search_query,
+            "start": 0,
+            "max_results": min(max_results, 30),
+            "sortBy": "lastUpdatedDate",
+            "sortOrder": "descending",
+        },
+        quote_via=urllib.parse.quote,
+    )
+    full_url = f"{base_url}?{qs}"
 
-    try:
-        with httpx.Client(timeout=30.0) as client:
-            resp = client.get(url, params=params)
+    max_retries = 3
+    backoff = 6  # seconds — start at 6 s, double each retry
+    last_error: Exception | None = None
+
+    for attempt in range(max_retries + 1):
+        try:
+            with httpx.Client(timeout=30.0) as client:
+                # Pass the pre-encoded URL directly so httpx does not re-encode it
+                resp = client.get(full_url)
+
+            if resp.status_code == 429:
+                wait = backoff * (2**attempt)
+                logger.warning(
+                    "arXiv: 429 rate-limited on attempt %d/%d — sleeping %d s",
+                    attempt + 1,
+                    max_retries + 1,
+                    wait,
+                )
+                time.sleep(wait)
+                continue
+
             resp.raise_for_status()
 
-        # arXiv 返回 Atom XML
-        from xml.etree import ElementTree
+            # arXiv 返回 Atom XML
+            from xml.etree import ElementTree
 
-        ns = {
-            "atom": "http://www.w3.org/2005/Atom",
-            "arxiv": "http://arxiv.org/schemas/atom",
-        }
-        root = ElementTree.fromstring(resp.text)
+            ns = {
+                "atom": "http://www.w3.org/2005/Atom",
+                "arxiv": "http://arxiv.org/schemas/atom",
+            }
+            root = ElementTree.fromstring(resp.text)
 
-        results = []
-        for entry in root.findall("atom:entry", ns):
-            title_el = entry.find("atom:title", ns)
-            summary_el = entry.find("atom:summary", ns)
-            link_el = entry.find("atom:id", ns)
-            published_el = entry.find("atom:published", ns)
+            results = []
+            for entry in root.findall("atom:entry", ns):
+                title_el = entry.find("atom:title", ns)
+                summary_el = entry.find("atom:summary", ns)
+                link_el = entry.find("atom:id", ns)
+                published_el = entry.find("atom:published", ns)
 
-            # 提取作者列表
-            authors = []
-            for author_el in entry.findall("atom:author", ns):
-                name_el = author_el.find("atom:name", ns)
-                if name_el is not None and name_el.text:
-                    authors.append(name_el.text.strip())
+                # 提取作者列表
+                authors = []
+                for author_el in entry.findall("atom:author", ns):
+                    name_el = author_el.find("atom:name", ns)
+                    if name_el is not None and name_el.text:
+                        authors.append(name_el.text.strip())
 
-            # 提取分类
-            categories = []
-            primary_cat_el = entry.find("arxiv:primary_category", ns)
-            if primary_cat_el is not None:
-                categories.append(primary_cat_el.get("term", ""))
-            for cat_el in entry.findall("atom:category", ns):
-                term = cat_el.get("term", "")
-                if term and term not in categories:
-                    categories.append(term)
+                # 提取分类
+                categories = []
+                primary_cat_el = entry.find("arxiv:primary_category", ns)
+                if primary_cat_el is not None:
+                    categories.append(primary_cat_el.get("term", ""))
+                for cat_el in entry.findall("atom:category", ns):
+                    term = cat_el.get("term", "")
+                    if term and term not in categories:
+                        categories.append(term)
 
-            # 提取 PDF 链接
-            pdf_url = ""
-            for link_node in entry.findall("atom:link", ns):
-                if link_node.get("title") == "pdf":
-                    pdf_url = link_node.get("href", "")
-                    break
+                # 提取 PDF 链接
+                pdf_url = ""
+                for link_node in entry.findall("atom:link", ns):
+                    if link_node.get("title") == "pdf":
+                        pdf_url = link_node.get("href", "")
+                        break
 
-            results.append(
-                {
-                    "title": (title_el.text or "").strip().replace("\n", " ")
-                    if title_el is not None
-                    else "",
-                    "summary": (summary_el.text or "").strip()[:800]
-                    if summary_el is not None
-                    else "",
-                    "authors": authors,
-                    "categories": categories,
-                    "url": (link_el.text or "").strip() if link_el is not None else "",
-                    "pdf_url": pdf_url,
-                    "published": (published_el.text or "").strip()
-                    if published_el is not None
-                    else "",
-                    "source": "arxiv",
-                }
+                results.append(
+                    {
+                        "title": (title_el.text or "").strip().replace("\n", " ")
+                        if title_el is not None
+                        else "",
+                        "summary": (summary_el.text or "").strip()[:800]
+                        if summary_el is not None
+                        else "",
+                        "authors": authors,
+                        "categories": categories,
+                        "url": (link_el.text or "").strip()
+                        if link_el is not None
+                        else "",
+                        "pdf_url": pdf_url,
+                        "published": (published_el.text or "").strip()
+                        if published_el is not None
+                        else "",
+                        "source": "arxiv",
+                    }
+                )
+            return json.dumps(results, indent=2, ensure_ascii=False)
+
+        except Exception as e:
+            last_error = e
+            logger.error(
+                "arXiv: attempt %d/%d failed: %s", attempt + 1, max_retries + 1, e
             )
-        return json.dumps(results, indent=2, ensure_ascii=False)
-    except Exception as e:
-        return f"Error querying arXiv: {e}"
+
+    return f"Error querying arXiv: {last_error}"
 
 
 # ---------------------------------------------------------------------------

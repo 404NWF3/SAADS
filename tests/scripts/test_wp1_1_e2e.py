@@ -216,6 +216,7 @@ async def main():
         return
 
     # 模式 2: dark_web only
+    dw_ok = None
     if mode in ("dark-web", "full"):
         from saads.config import OPENAI_API_KEY
 
@@ -223,13 +224,11 @@ async def main():
             dw_ok = await test_dark_web_only()
         else:
             print("\n--- Dark Web Only Flow --- [SKIP: no OPENAI_API_KEY]")
-            dw_ok = None
 
     # 模式 3: 完整流程
+    full_ok = None
     if mode == "full":
         full_ok = await test_full()
-    else:
-        full_ok = None
 
     print(f"\n{'=' * 60}")
     print("WP1-1 端到端验证完成!")

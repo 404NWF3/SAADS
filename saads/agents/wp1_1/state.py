@@ -4,6 +4,7 @@ WP1-1 情报采集智能体 — LangGraph 状态定义。
 
 from __future__ import annotations
 
+import operator
 from typing import Annotated, TypedDict
 
 from langgraph.graph.message import add_messages
@@ -22,10 +23,12 @@ class IntelState(TypedDict):
     collection_strategy: dict
 
     # 各 Crawler Agent 返回的原始情报数据
-    raw_intel: list[dict]
+    # operator.add reducer: 并行 fan-out 节点的返回值自动合并 (list concat)
+    raw_intel: Annotated[list[dict], operator.add]
 
     # Standardizer Agent 标准化后的攻击条目
-    standardized_entries: list[AttackEntry]
+    # operator.add reducer: 同上
+    standardized_entries: Annotated[list[AttackEntry], operator.add]
 
     # OWASP LLM Top 10 覆盖率报告
     coverage_report: dict
