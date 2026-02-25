@@ -20,3 +20,10 @@
 /chat-history/
 
 .env
+
+/.github/
+
+/docs/diagrams/
+/docs/articles/
+/docs/plan/
+
