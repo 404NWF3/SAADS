@@ -3,122 +3,160 @@
    ============================================ */
 
 /* 导入字体 - 人文与机器的融合 */
-@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap'); /* 衬线体 - 人文属性 */
-@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap'); /* 无衬线体 - 机器属性 */
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap'); /* 等宽字体 */
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+/* 衬线体 - 人文属性 */
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap');
+/* 无衬线体 - 机器属性 */
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap');
+/* 等宽字体 */
 
 :root {
   /* ========== 颜色系统 - 理性人文主义 (纸张感浅色主题) ========== */
   /* 背景色 - 温暖纸张感 */
-  --bg-primary: #FAF9F5;          /* 主背景 - 温暖米白 */
-  --bg-secondary: #FFFFFF;        /* 卡片/表面 - 纯白 */
-  --bg-tertiary: #F2F0E9;         /* 次级区域 - 柔和米色 */
-  --bg-elevated: #FFFFFF;         /* 悬浮元素 */
-  
+  --bg-primary: #FAF9F5;
+  /* 主背景 - 温暖米白 */
+  --bg-secondary: #FFFFFF;
+  /* 卡片/表面 - 纯白 */
+  --bg-tertiary: #F2F0E9;
+  /* 次级区域 - 柔和米色 */
+  --bg-elevated: #FFFFFF;
+  /* 悬浮元素 */
+
   /* 主色调 - FourAgent 橙红色系 */
-  --color-primary: #C1440E;       /* 主色 - 橙红 */
-  --color-primary-light: #E05C2A; /* 亮橙 */
-  --color-primary-dark: #B5600A;  /* 橙棕 */
+  --color-primary: #C1440E;
+  /* 主色 - 橙红 */
+  --color-primary-light: #E05C2A;
+  /* 亮橙 */
+  --color-primary-dark: #B5600A;
+  /* 橙棕 */
   --color-primary-alpha-10: rgba(193, 68, 14, 0.1);
   --color-primary-alpha-60: rgba(193, 68, 14, 0.6);
-  
+
   /* Agent 节点色系 */
-  --agent-1: #C1440E;             /* Agent 1 - 橙红 */
-  --agent-2: #2D3E8C;             /* Agent 2 - 深蓝 */
-  --agent-3: #B5600A;             /* Agent 3 - 橙棕 */
-  --agent-4: #1A6B5A;             /* Agent 4 - 青绿 */
-  
+  --agent-1: #C1440E;
+  /* Agent 1 - 橙红 */
+  --agent-2: #2D3E8C;
+  /* Agent 2 - 深蓝 */
+  --agent-3: #B5600A;
+  /* Agent 3 - 橙棕 */
+  --agent-4: #1A6B5A;
+  /* Agent 4 - 青绿 */
+
   /* 强调色 */
-  --color-accent: #E05C2A;        /* 强调 - 亮橙 */
-  --color-accent-light: #F07340;  /* 浅橙 */
-  --color-accent-dark: #C1440E;   /* 深橙 */
-  
+  --color-accent: #E05C2A;
+  /* 强调 - 亮橙 */
+  --color-accent-light: #F07340;
+  /* 浅橙 */
+  --color-accent-dark: #C1440E;
+  /* 深橙 */
+
   /* 状态色 - 基于 FourAgent 色系 */
-  --color-success: #1A6B5A;       /* 成功 - 青绿 */
+  --color-success: #1A6B5A;
+  /* 成功 - 青绿 */
   --color-success-bg: rgba(26, 107, 90, 0.1);
-  --color-warning: #B5600A;       /* 警告 - 橙棕 */
+  --color-warning: #B5600A;
+  /* 警告 - 橙棕 */
   --color-warning-bg: rgba(181, 96, 10, 0.1);
-  --color-danger: #C1440E;        /* 危险 - 橙红 */
+  --color-danger: #C1440E;
+  /* 危险 - 橙红 */
   --color-danger-bg: rgba(193, 68, 14, 0.1);
-  --color-info: #2D3E8C;          /* 信息 - 深蓝 */
+  --color-info: #2D3E8C;
+  /* 信息 - 深蓝 */
   --color-info-bg: rgba(45, 62, 140, 0.1);
-  
+
   /* 文字色 - 墨水感 (禁止纯黑) */
-  --text-primary: #141413;        /* 深炭黑 - 主文字 */
-  --text-secondary: #5A5955;      /* 深灰 - 次要文字 */
-  --text-tertiary: #87867F;       /* 中灰 - 三级文字 */
-  --text-muted: #B0AEA5;          /* 石灰色 - 弱化文字 */
-  
+  --text-primary: #141413;
+  /* 深炭黑 - 主文字 */
+  --text-secondary: #5A5955;
+  /* 深灰 - 次要文字 */
+  --text-tertiary: #87867F;
+  /* 中灰 - 三级文字 */
+  --text-muted: #B0AEA5;
+  /* 石灰色 - 弱化文字 */
+
   /* 边框色 - 纤细清晰 */
-  --border-primary: rgba(26, 24, 20, 0.14);    /* 主边框 - 极淡 */
-  --border-secondary: rgba(26, 24, 20, 0.18);  /* 次级边框 */
-  --border-hover: #C1440E;        /* 悬停边框 - 橙红色 */
-  
+  --border-primary: rgba(26, 24, 20, 0.14);
+  /* 主边框 - 极淡 */
+  --border-secondary: rgba(26, 24, 20, 0.18);
+  /* 次级边框 */
+  --border-hover: #C1440E;
+  /* 悬停边框 - 橙红色 */
+
   /* Header */
   --header-bg: #FAF9F5;
   --header-color: #141413;
   --header-height: 64px;
   --header-subheader-bg: #F2F0E9;
   --header-subheader-color: #141413;
-  
+
   /* Footer */
   --footer-bg: #F2F0E9;
   --footer-color: #5A5955;
   --footer-border: #E8E6DC;
-  
+
   /* 卡片 - 精密工程感 */
   --card-bg: #FFFFFF;
   --card-border: #E8E6DC;
   --card-shadow: 0 1px 3px rgba(20, 20, 19, 0.08);
-  --card-radius: 6px;             /* 微小圆角 - 精密感 */
+  --card-radius: 6px;
+  /* 微小圆角 - 精密感 */
   --card-inner-radius: 4px;
-  
+
   /* 内容块 */
   --content-block-bg: #F2F0E9;
   --content-block-color: #141413;
   --content-block-button-bg: #7BA4D4;
   --content-block-button-color: #FFFFFF;
   --content-block-button-radius: 4px;
-  
+
   /* 搜索栏 */
   --search-bar-radius: 4px;
   --search-bar-width: 100%;
-  
+
   /* TOC 目录 */
   --toc-active-border: #7BA4D4;
   --toc-inactive-border: #E8E6DC;
   --toc-inactive-color: #87867F;
   --toc-active-font-weight: 600;
-  
+
   /* 网格线 - 极其微弱的数学网格 */
   --grid-color: rgba(20, 20, 19, 0.02);
   --grid-line-color: rgba(20, 20, 19, 0.04);
-  
+
   /* ========== 字体系统 - 人文与机器的对话 ========== */
-  --font-serif: 'Lora', 'Source Serif 4', Georgia, serif;                    /* 正文 - 人文属性 */
-  --font-sans: 'Inter Tight', -apple-system, BlinkMacSystemFont, sans-serif; /* 标题/UI - 机器属性 */
-  --font-mono: 'Fira Code', 'JetBrains Mono', 'SF Mono', monospace;         /* 代码/数据 */
-  
+  --font-serif: 'Lora', 'Source Serif 4', Georgia, serif;
+  /* 正文 - 人文属性 */
+  --font-sans: 'Inter Tight', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* 标题/UI - 机器属性 */
+  --font-mono: 'Fira Code', 'JetBrains Mono', 'SF Mono', monospace;
+  /* 代码/数据 */
+
   /* ========== 间距系统 - 慷慨的负空间 ========== */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
   --spacing-lg: 24px;
-  --spacing-xl: 48px;             /* 更大的边距 */
-  --spacing-2xl: 64px;            /* 极端负空间 */
-  --spacing-3xl: 96px;            /* 呼吸感 */
-  
+  --spacing-xl: 48px;
+  /* 更大的边距 */
+  --spacing-2xl: 64px;
+  /* 极端负空间 */
+  --spacing-3xl: 96px;
+  /* 呼吸感 */
+
   /* ========== 圆角系统 - 精密工程感 ========== */
   --radius-xs: 2px;
-  --radius-sm: 4px;               /* 微小圆角 */
-  --radius-md: 6px;               /* 精密感 */
-  --radius-lg: 8px;               /* 避免过度圆角 */
-  
+  --radius-sm: 4px;
+  /* 微小圆角 */
+  --radius-md: 6px;
+  /* 精密感 */
+  --radius-lg: 8px;
+  /* 避免过度圆角 */
+
   /* ========== 动画系统 - FourAgent 流畅曲线 ========== */
   --transition-fast: 120ms ease-out;
   --transition-normal: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   --transition-slow: 0.9s cubic-bezier(0.16, 1, 0.3, 1);
-  
+
   /* ========== 阴影系统 - FourAgent 精密阴影 ========== */
   --shadow-sm: 0 1px 2px rgba(26, 24, 20, 0.08);
   --shadow-md: 0 2px 4px rgba(26, 24, 20, 0.1), 0 0 0 1px rgba(26, 24, 20, 0.14);
@@ -158,7 +196,8 @@
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
   transition: all var(--transition-normal);
-  font-family: var(--font-serif); /* 卡片内容使用衬线体 */
+  font-family: var(--font-serif);
+  /* 卡片内容使用衬线体 */
   position: relative;
   overflow: hidden;
 }
@@ -216,28 +255,38 @@
 }
 
 @keyframes blink {
-  0%, 50% {
+
+  0%,
+  50% {
     opacity: 1;
   }
-  51%, 100% {
+
+  51%,
+  100% {
     opacity: 0;
   }
 }
 
 /* FourAgent 动画 */
 @keyframes breathe {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 0 0 rgba(224, 92, 42, 0.5);
   }
+
   50% {
     box-shadow: 0 0 0 7px rgba(224, 92, 42, 0);
   }
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.45;
   }
@@ -265,21 +314,30 @@
 }
 
 @keyframes dots {
-  0%, 20% { content: '.'; }
-  40% { content: '..'; }
-  60%, 100% { content: '...'; }
+
+  0%,
+  20% {
+    content: '.';
+  }
+
+  40% {
+    content: '..';
+  }
+
+  60%,
+  100% {
+    content: '...';
+  }
 }
 
 /* ============================================
    数据流动画 - 极其克制
    ============================================ */
 .data-flow {
-  background: linear-gradient(
-    90deg,
-    var(--bg-tertiary) 0%,
-    var(--bg-secondary) 50%,
-    var(--bg-tertiary) 100%
-  );
+  background: linear-gradient(90deg,
+      var(--bg-tertiary) 0%,
+      var(--bg-secondary) 50%,
+      var(--bg-tertiary) 100%);
   background-size: 200% 100%;
   animation: dataFlow 3s ease-in-out infinite;
 }
@@ -288,9 +346,11 @@
   0% {
     background-position: 0% 0;
   }
+
   50% {
     background-position: 100% 0;
   }
+
   100% {
     background-position: 0% 0;
   }
@@ -308,6 +368,7 @@
     opacity: 0;
     transform: translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -498,17 +559,17 @@
   border-radius: 50%;
 }
 
-.toggle-switch input:checked + .toggle-slider {
+.toggle-switch input:checked+.toggle-slider {
   background-color: var(--color-primary);
   border-color: var(--color-primary);
 }
 
-.toggle-switch input:checked + .toggle-slider::before {
+.toggle-switch input:checked+.toggle-slider::before {
   transform: translateX(20px);
   background-color: #FFFFFF;
 }
 
-.toggle-switch input:disabled + .toggle-slider {
+.toggle-switch input:disabled+.toggle-slider {
   opacity: 0.4;
   cursor: not-allowed;
 }
@@ -769,6 +830,7 @@
 }
 
 @media (max-width: 768px) {
+
   .data-grid-2,
   .data-grid-3,
   .data-grid-4 {
@@ -842,9 +904,12 @@
 
 /* Float Animation for CTA Blobs */
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(0, 0) scale(1);
   }
+
   50% {
     transform: translate(30px, -20px) scale(1.05);
   }
@@ -861,14 +926,23 @@
   --dark-bg: #16213e;
   --dark-mid: #1a2a55;
 
-  /* Dashboard 深蓝色主题 */
-  --dashboard-bg-primary: #0a1628;        /* 主背景 - 深蓝黑 */
-  --dashboard-bg-secondary: #0f1f3a;      /* 次级背景 - 深蓝 */
-  --dashboard-bg-tertiary: #16213e;       /* 三级背景 - 中蓝 */
-  --dashboard-bg-elevated: #1a2a55;       /* 悬浮元素 - 亮蓝 */
-  --dashboard-accent: #2D3E8C;            /* 强调色 - Agent 2 深蓝 */
-  --dashboard-accent-light: #3d4e9c;      /* 亮蓝 */
-  --dashboard-border: rgba(45, 62, 140, 0.15);  /* 边框 - 深蓝透明 */
-  --dashboard-border-hover: rgba(45, 62, 140, 0.3);  /* 悬停边框 */
-  --dashboard-glow: rgba(45, 62, 140, 0.2);  /* 发光效果 */
+  /* Dashboard Claude 明亮暖橘主题 - 纯橙色调 */
+  --dashboard-bg-primary: #FDF6EE;
+  /* 主背景 - 浅奶油橙 */
+  --dashboard-bg-secondary: #FFF8F0;
+  /* 次级背景 - 极浅橙白 */
+  --dashboard-bg-tertiary: #FFEEDD;
+  /* 三级背景 - 淡杏橙 */
+  --dashboard-bg-elevated: #FFFFFF;
+  /* 悬浮元素 - 纯白 */
+  --dashboard-accent: #E07B2F;
+  /* 强调色 - 明亮橙 */
+  --dashboard-accent-light: #F5923D;
+  /* 亮橙 */
+  --dashboard-border: rgba(224, 123, 47, 0.15);
+  /* 边框 - 橙色透明 */
+  --dashboard-border-hover: rgba(224, 123, 47, 0.3);
+  /* 悬停边框 */
+  --dashboard-glow: rgba(245, 146, 61, 0.2);
+  /* 发光效果 - 亮橙 */
 }

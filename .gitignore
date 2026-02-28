@@ -27,3 +27,7 @@
 /docs/articles/
 /docs/plan/
 
+# Node.js
+node_modules/
+package-lock.json
+

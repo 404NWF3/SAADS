@@ -192,7 +192,7 @@ const DashboardLayout: React.FC = () => {
             top: 0,
             zIndex: 10,
             backdropFilter: 'blur(10px)',
-            background: 'rgba(15, 31, 58, 0.8)',
+            background: 'var(--dashboard-bg-primary)',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -207,28 +207,19 @@ const DashboardLayout: React.FC = () => {
                 color: '#a3a3a3',
               }}
             />
-            <div style={{ marginLeft: 16 }}>
+            <div style={{ marginLeft: 16, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <Text
                 style={{
                   fontSize: 18,
                   fontWeight: 600,
                   color: '#f5f5f5',
-                  fontFamily: "'Playfair Display', serif",
+                  fontFamily: "'JetBrains Mono', monospace",
+                  lineHeight: 1,
+                  textAlign: 'center',
                 }}
               >
-                多智能体大模型安全态势感知平台
+                Multi-Agent LLM Security Awareness System
               </Text>
-              <div>
-                <Text
-                  style={{
-                    color: '#6366f1',
-                    fontSize: 12,
-                    fontFamily: "'JetBrains Mono', monospace",
-                  }}
-                >
-                  Multi-Agent LLM Security Awareness System
-                </Text>
-              </div>
             </div>
           </div>
 

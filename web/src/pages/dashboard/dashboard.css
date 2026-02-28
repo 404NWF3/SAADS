@@ -1,0 +1,705 @@
+/* ══════════════════════════════════════
+   Dashboard Styles - 与 Home 页面风格一致
+   温暖人文主义设计语言
+══════════════════════════════════════ */
+
+/* ── 变量定义 ── */
+:root {
+    /* 背景色 - 温暖纸张感 */
+    --dash-cream: #faf9f7;
+    --dash-cream-dark: #f2f0ec;
+    --dash-cream-border: #e8e4de;
+
+    /* 文字色 - 墨水感 */
+    --dash-ink: #1a1917;
+    --dash-ink-mid: #3d3c3a;
+    --dash-ink-muted: #7a7774;
+    --dash-ink-dim: #b0ada8;
+
+    /* 主色调 */
+    --dash-terra: #cc4e1e;
+    --dash-terra-lt: #f4e8e2;
+    --dash-slate: #3b5068;
+    --dash-slate-lt: #e4eaf2;
+    --dash-gold: #c4860a;
+    --dash-gold-lt: #fdf4e0;
+    --dash-green: #2d6a4f;
+    --dash-green-lt: #e4f0ea;
+    --dash-red: #b91c1c;
+
+    /* 字体 */
+    --dash-mono: 'DM Mono', 'Fira Code', monospace;
+    --dash-sans: 'DM Sans', 'Inter Tight', sans-serif;
+    --dash-serif: 'Instrument Serif', 'Lora', serif;
+}
+
+/* ── 页面容器 ── */
+.dashboard-page {
+    background: var(--dash-cream);
+    min-height: 100vh;
+    padding: 24px 32px;
+    color: var(--dash-ink);
+    font-family: var(--dash-sans);
+}
+
+/* ── 页面标题 ── */
+.dashboard-header {
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--dash-cream-border);
+}
+
+.dashboard-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.dashboard-title-icon {
+    font-size: 24px;
+    color: var(--dash-terra);
+}
+
+.dashboard-title h3 {
+    margin: 0;
+    font-family: var(--dash-serif);
+    font-size: 32px;
+    font-weight: 400;
+    color: var(--dash-ink);
+    letter-spacing: -0.02em;
+}
+
+.dashboard-subtitle {
+    margin-left: 36px;
+    font-size: 14px;
+    color: var(--dash-ink-muted);
+    line-height: 1.6;
+}
+
+/* ── 统计卡片 ── */
+.dash-stat-card {
+    background: white;
+    border: 1px solid var(--dash-cream-border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.dash-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--card-accent, var(--dash-terra));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.dash-stat-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.dash-stat-card:hover::before {
+    opacity: 1;
+}
+
+.dash-stat-title {
+    font-size: 11px;
+    font-family: var(--dash-mono);
+    color: var(--dash-ink-dim);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.dash-stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    font-family: var(--dash-mono);
+    color: var(--dash-ink);
+    line-height: 1;
+}
+
+.dash-stat-suffix {
+    font-size: 14px;
+    color: var(--dash-ink-muted);
+    margin-left: 4px;
+}
+
+.dash-stat-trend {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 8px;
+    font-size: 11px;
+    font-family: var(--dash-mono);
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.dash-stat-trend.up {
+    background: var(--dash-green-lt);
+    color: var(--dash-green);
+}
+
+.dash-stat-trend.down {
+    background: rgba(185, 28, 28, 0.1);
+    color: var(--dash-red);
+}
+
+/* ── 面板/卡片 ── */
+.dash-panel {
+    background: white;
+    border: 1px solid var(--dash-cream-border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    margin-bottom: 16px;
+}
+
+.dash-panel-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--dash-cream-border);
+    background: var(--dash-cream-dark);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.dash-panel-title {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--dash-ink-mid);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dash-panel-title-icon {
+    color: var(--dash-terra);
+}
+
+.dash-panel-extra {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dash-panel-body {
+    padding: 20px;
+}
+
+/* ── 日志流 ── */
+.dash-log-feed {
+    height: 200px;
+    overflow-y: auto;
+    font-family: var(--dash-mono);
+    font-size: 11px;
+    line-height: 2;
+}
+
+.dash-log-feed::-webkit-scrollbar {
+    width: 4px;
+}
+
+.dash-log-feed::-webkit-scrollbar-thumb {
+    background: var(--dash-cream-border);
+    border-radius: 2px;
+}
+
+.dash-log-entry {
+    display: flex;
+    gap: 10px;
+    padding: 2px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.dash-log-timestamp {
+    color: var(--dash-ink-dim);
+    min-width: 74px;
+}
+
+.dash-log-agent {
+    min-width: 58px;
+    font-weight: 500;
+}
+
+.dash-log-agent.wp1-1 {
+    color: var(--dash-terra);
+}
+
+.dash-log-agent.wp1-2 {
+    color: var(--dash-slate);
+}
+
+.dash-log-agent.wp1-3 {
+    color: var(--dash-gold);
+}
+
+.dash-log-agent.wp1-4 {
+    color: var(--dash-green);
+}
+
+.dash-log-agent.system {
+    color: var(--dash-ink-mid);
+}
+
+.dash-log-level {
+    min-width: 50px;
+    font-size: 9px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+}
+
+.dash-log-level.info {
+    background: var(--dash-slate-lt);
+    color: var(--dash-slate);
+}
+
+.dash-log-level.success {
+    background: var(--dash-green-lt);
+    color: var(--dash-green);
+}
+
+.dash-log-level.warning {
+    background: var(--dash-gold-lt);
+    color: var(--dash-gold);
+}
+
+.dash-log-level.debug {
+    background: var(--dash-cream-dark);
+    color: var(--dash-ink-muted);
+}
+
+.dash-log-message {
+    color: var(--dash-ink-muted);
+    flex: 1;
+}
+
+/* ── 流水线步骤 ── */
+.dash-pipeline {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 10px 0;
+    overflow-x: auto;
+}
+
+.dash-pipeline-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    min-width: 120px;
+}
+
+.dash-pipeline-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    border: 2px solid var(--dash-cream-border);
+    background: white;
+    color: var(--dash-ink-muted);
+    transition: all 0.3s ease;
+}
+
+.dash-pipeline-node.completed .dash-pipeline-icon {
+    background: var(--dash-green-lt);
+    border-color: var(--dash-green);
+    color: var(--dash-green);
+}
+
+.dash-pipeline-node.running .dash-pipeline-icon {
+    background: var(--dash-terra-lt);
+    border-color: var(--dash-terra);
+    color: var(--dash-terra);
+    animation: pulse-ring 2s ease-in-out infinite;
+}
+
+.dash-pipeline-node.failed .dash-pipeline-icon {
+    background: rgba(185, 28, 28, 0.1);
+    border-color: var(--dash-red);
+    color: var(--dash-red);
+}
+
+@keyframes pulse-ring {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(204, 78, 30, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 0 8px rgba(204, 78, 30, 0);
+    }
+}
+
+.dash-pipeline-label {
+    font-size: 11px;
+    color: var(--dash-ink-mid);
+    text-align: center;
+}
+
+.dash-pipeline-status {
+    font-size: 10px;
+    font-family: var(--dash-mono);
+    color: var(--dash-ink-dim);
+}
+
+.dash-pipeline-arrow {
+    flex: 1;
+    min-width: 40px;
+    max-width: 80px;
+    height: 2px;
+    background: var(--dash-cream-border);
+    position: relative;
+}
+
+.dash-pipeline-arrow::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: -3px;
+    border: 4px solid transparent;
+    border-left-color: var(--dash-cream-border);
+}
+
+/* ── 数据表格 ── */
+.dash-table-wrapper {
+    overflow-x: auto;
+}
+
+/* Ant Design 表格样式覆盖 */
+.dashboard-page .ant-table {
+    background: transparent !important;
+    font-family: var(--dash-sans);
+}
+
+.dashboard-page .ant-table-thead>tr>th {
+    background: var(--dash-cream-dark) !important;
+    color: var(--dash-ink-mid) !important;
+    border-bottom: 1px solid var(--dash-cream-border) !important;
+    font-family: var(--dash-mono) !important;
+    font-size: 11px !important;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 600 !important;
+}
+
+.dashboard-page .ant-table-tbody>tr>td {
+    background: white !important;
+    border-bottom: 1px solid var(--dash-cream-border) !important;
+    color: var(--dash-ink) !important;
+}
+
+.dashboard-page .ant-table-tbody>tr:hover>td {
+    background: var(--dash-cream) !important;
+}
+
+/* ── Tag 标签 ── */
+.dash-tag {
+    font-size: 10px;
+    font-family: var(--dash-mono);
+    padding: 3px 10px;
+    border-radius: 4px;
+    border: 1px solid;
+    display: inline-block;
+}
+
+.dash-tag-terra {
+    color: var(--dash-terra);
+    border-color: rgba(204, 78, 30, 0.25);
+    background: var(--dash-terra-lt);
+}
+
+.dash-tag-slate {
+    color: var(--dash-slate);
+    border-color: rgba(59, 80, 104, 0.25);
+    background: var(--dash-slate-lt);
+}
+
+.dash-tag-gold {
+    color: var(--dash-gold);
+    border-color: rgba(196, 134, 10, 0.25);
+    background: var(--dash-gold-lt);
+}
+
+.dash-tag-green {
+    color: var(--dash-green);
+    border-color: rgba(45, 106, 79, 0.25);
+    background: var(--dash-green-lt);
+}
+
+.dash-tag-red {
+    color: var(--dash-red);
+    border-color: rgba(185, 28, 28, 0.25);
+    background: rgba(185, 28, 28, 0.08);
+}
+
+/* ── 按钮 ── */
+.dash-btn-primary {
+    background: linear-gradient(135deg, var(--dash-terra) 0%, #e05c2a 100%);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    padding: 10px 20px;
+    font-family: var(--dash-sans);
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 8px rgba(204, 78, 30, 0.25);
+}
+
+.dash-btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(204, 78, 30, 0.35);
+}
+
+/* ── 输入框 ── */
+.dashboard-page .ant-input {
+    background: white !important;
+    border: 1px solid var(--dash-cream-border) !important;
+    color: var(--dash-ink) !important;
+    border-radius: 6px !important;
+}
+
+.dashboard-page .ant-input:hover,
+.dashboard-page .ant-input:focus {
+    border-color: var(--dash-terra) !important;
+    box-shadow: 0 0 0 2px rgba(204, 78, 30, 0.1) !important;
+}
+
+.dashboard-page .ant-input::placeholder {
+    color: var(--dash-ink-dim) !important;
+}
+
+/* ── 选择器 ── */
+.dashboard-page .ant-select-selector {
+    background: white !important;
+    border: 1px solid var(--dash-cream-border) !important;
+    color: var(--dash-ink) !important;
+    border-radius: 6px !important;
+}
+
+.dashboard-page .ant-select:hover .ant-select-selector {
+    border-color: var(--dash-terra) !important;
+}
+
+.dashboard-page .ant-select-dropdown {
+    background: white !important;
+    border: 1px solid var(--dash-cream-border) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+}
+
+.dashboard-page .ant-select-item {
+    color: var(--dash-ink) !important;
+}
+
+.dashboard-page .ant-select-item-option-active {
+    background: var(--dash-cream) !important;
+}
+
+.dashboard-page .ant-select-item-option-selected {
+    background: var(--dash-terra-lt) !important;
+    color: var(--dash-terra) !important;
+}
+
+/* ── 分页 ── */
+.dashboard-page .ant-pagination-item {
+    background: white !important;
+    border: 1px solid var(--dash-cream-border) !important;
+    border-radius: 4px !important;
+}
+
+.dashboard-page .ant-pagination-item a {
+    color: var(--dash-ink-muted) !important;
+}
+
+.dashboard-page .ant-pagination-item-active {
+    border-color: var(--dash-terra) !important;
+}
+
+.dashboard-page .ant-pagination-item-active a {
+    color: var(--dash-terra) !important;
+}
+
+.dashboard-page .ant-pagination-prev button,
+.dashboard-page .ant-pagination-next button {
+    color: var(--dash-ink-muted) !important;
+}
+
+/* ── 抽屉 ── */
+.dashboard-page .ant-drawer-header {
+    background: var(--dash-cream-dark) !important;
+    border-bottom: 1px solid var(--dash-cream-border) !important;
+}
+
+.dashboard-page .ant-drawer-title {
+    color: var(--dash-ink) !important;
+}
+
+.dashboard-page .ant-drawer-body {
+    background: var(--dash-cream) !important;
+}
+
+.dashboard-page .ant-drawer-close {
+    color: var(--dash-ink-muted) !important;
+}
+
+/* ── 描述列表 ── */
+.dashboard-page .ant-descriptions-bordered .ant-descriptions-item-label {
+    background: var(--dash-cream-dark) !important;
+    color: var(--dash-ink-muted) !important;
+    border-color: var(--dash-cream-border) !important;
+}
+
+.dashboard-page .ant-descriptions-bordered .ant-descriptions-item-content {
+    background: white !important;
+    color: var(--dash-ink) !important;
+    border-color: var(--dash-cream-border) !important;
+}
+
+/* ── 进度条 ── */
+.dashboard-page .ant-progress-text {
+    color: var(--dash-ink) !important;
+}
+
+/* ── Steps 步骤条 ── */
+.dashboard-page .ant-steps .ant-steps-item-title {
+    color: var(--dash-ink) !important;
+}
+
+.dashboard-page .ant-steps .ant-steps-item-description {
+    color: var(--dash-ink-muted) !important;
+}
+
+.dashboard-page .ant-steps .ant-steps-item-tail::after {
+    background: var(--dash-cream-border) !important;
+}
+
+/* ── 代码块 ── */
+.dash-code-block {
+    background: #1a1917;
+    border: 1px solid var(--dash-cream-border);
+    border-radius: 6px;
+    padding: 16px;
+    font-family: var(--dash-mono);
+    font-size: 12px;
+    color: #e6edf3;
+    overflow-x: auto;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+/* ── 图表容器 ── */
+.dash-chart-container {
+    padding: 16px;
+    background: white;
+    border-radius: 8px;
+}
+
+/* ── 覆盖率网格 ── */
+.dash-coverage-item {
+    padding: 16px;
+    background: white;
+    border: 1px solid var(--dash-cream-border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dash-coverage-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.dash-coverage-label {
+    font-size: 12px;
+    color: var(--dash-ink-muted);
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* ── 状态指示器 ── */
+.dash-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.dash-status-dot.active {
+    background: var(--dash-green);
+    animation: status-pulse 2s ease-in-out infinite;
+}
+
+.dash-status-dot.warning {
+    background: var(--dash-gold);
+    animation: status-pulse 2s ease-in-out infinite;
+}
+
+.dash-status-dot.error {
+    background: var(--dash-red);
+}
+
+.dash-status-dot.idle {
+    background: var(--dash-ink-dim);
+}
+
+@keyframes status-pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* ── 渐入动画 ── */
+.dash-fade-in {
+    opacity: 0;
+    transform: translateY(12px);
+    animation: dashFadeIn 0.5s ease forwards;
+}
+
+@keyframes dashFadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ── 响应式 ── */
+@media (max-width: 768px) {
+    .dashboard-page {
+        padding: 16px;
+    }
+
+    .dashboard-title h3 {
+        font-size: 24px;
+    }
+
+    .dash-stat-value {
+        font-size: 24px;
+    }
+}

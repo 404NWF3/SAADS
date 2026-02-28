@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Row, Col, Typography, Space, Steps, Button, message, Progress, Tag, Tooltip } from 'antd';
+import { Row, Col, Typography, Space, Button, message, Progress, Tooltip } from 'antd';
 import {
   RadarChartOutlined,
   BugOutlined,
@@ -11,14 +11,14 @@ import {
   ClockCircleOutlined,
   WarningOutlined,
   ThunderboltOutlined,
+  ArrowUpOutlined,
+  ArrowDownOutlined,
 } from '@ant-design/icons';
 import { Column, Pie } from '@ant-design/charts';
 import { attackPoolApi, vulnReportApi, sandboxApi, idsApi, pipelineApi } from '../../services/api';
 import type { AttackPoolStats, VulnReportStats, SandboxStats, IDSStats, PipelineStatus } from '../../types';
-import { GlowCard, StatCard, LogStream, TypewriterText } from '../../components/common';
 import type { LogEntry } from '../../components/common';
-
-const { Title, Text } = Typography;
+import './dashboard.css';
 
 const DashboardOverview: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -114,49 +114,51 @@ const DashboardOverview: React.FC = () => {
     }
   };
 
-  const getStepStatus = (status: string): 'wait' | 'process' | 'finish' | 'error' => {
+  const getStepStatus = (status: string) => {
     switch (status) {
       case 'completed':
-        return 'finish';
+        return 'completed';
       case 'running':
-        return 'process';
+        return 'running';
       case 'failed':
-        return 'error';
+        return 'failed';
+      case 'idle':
+        return 'idle';
       default:
-        return 'wait';
+        return 'idle';
     }
   };
 
   const getStepIcon = (status: string) => {
     switch (status) {
       case 'completed':
-        return <CheckCircleOutlined style={{ color: '#10b981' }} />;
+        return <CheckCircleOutlined />;
       case 'running':
-        return <SyncOutlined spin style={{ color: 'var(--dashboard-accent)' }} />;
+        return <SyncOutlined spin />;
       case 'failed':
-        return <WarningOutlined style={{ color: '#ef4444' }} />;
+        return <WarningOutlined />;
       default:
-        return <ClockCircleOutlined style={{ color: '#525252' }} />;
+        return <ClockCircleOutlined />;
     }
   };
 
   // 攻击类别分布图配置
   const categoryData = attackStats
     ? Object.entries(attackStats.by_category).map(([type, value]) => ({
-        type: type.replace('_', ' ').toUpperCase(),
-        value,
-      }))
+      type: type.replace('_', ' ').toUpperCase(),
+      value,
+    }))
     : [];
 
   const categoryConfig = {
     data: categoryData,
     xField: 'type',
     yField: 'value',
-    color: 'var(--dashboard-accent)',
+    color: '#cc4e1e',
     label: {
       position: 'top' as const,
       style: {
-        fill: '#a3a3a3',
+        fill: '#7a7774',
         fontSize: 11,
       },
     },
@@ -165,26 +167,26 @@ const DashboardOverview: React.FC = () => {
         autoRotate: true,
         autoHide: false,
         style: {
-          fill: '#737373',
+          fill: '#7a7774',
           fontSize: 10,
         },
       },
       line: {
         style: {
-          stroke: 'var(--dashboard-border-hover)',
+          stroke: '#e8e4de',
         },
       },
     },
     yAxis: {
       label: {
         style: {
-          fill: '#737373',
+          fill: '#7a7774',
         },
       },
       grid: {
         line: {
           style: {
-            stroke: 'var(--dashboard-border)',
+            stroke: '#f2f0ec',
           },
         },
       },
@@ -195,10 +197,20 @@ const DashboardOverview: React.FC = () => {
   };
 
   // 漏洞严重级别饼图配置
+  const severityOrder = ['critical', 'high', 'medium', 'low'];
+  const severityColors: Record<string, string> = {
+    CRITICAL: '#b91c1c',  // 深红色 - 危急
+    HIGH: '#cc4e1e',      // 橙红色 - 高危
+    MEDIUM: '#c4860a',    // 橙黄色 - 中危
+    LOW: '#2d6a4f',       // 绿色 - 低危
+  };
+
   const severityData = vulnStats
-    ? Object.entries(vulnStats.by_severity).map(([severity, count]) => ({
+    ? severityOrder
+      .filter(severity => vulnStats.by_severity[severity] !== undefined)
+      .map(severity => ({
         type: severity.toUpperCase(),
-        value: count,
+        value: vulnStats.by_severity[severity],
       }))
     : [];
 
@@ -208,12 +220,12 @@ const DashboardOverview: React.FC = () => {
     colorField: 'type',
     radius: 0.8,
     innerRadius: 0.65,
-    color: ['#ef4444', '#6189BD', '#7BA4D4', '#22c55e'],
+    color: (datum: { type: string }) => severityColors[datum.type] || '#7a7774',
     label: {
       type: 'outer' as const,
-      content: '{name}: {value}',
+      content: (datum: { type: string; value: number }) => `${datum.type}: ${datum.value}`,
       style: {
-        fill: '#a3a3a3',
+        fill: '#7a7774',
         fontSize: 11,
       },
     },
@@ -221,280 +233,266 @@ const DashboardOverview: React.FC = () => {
       position: 'bottom' as const,
       itemName: {
         style: {
-          fill: '#a3a3a3',
+          fill: '#3d3c3a',
         },
       },
+    },
+    tooltip: {
+      formatter: (datum: { type: string; value: number }) => ({
+        name: datum.type,
+        value: `${datum.value} 个漏洞`,
+      }),
     },
     statistic: {
       title: {
         content: '总计',
         style: {
-          color: '#737373',
+          color: '#7a7774',
           fontSize: '12px',
         },
       },
       content: {
         content: vulnStats?.total.toString() || '0',
         style: {
-          color: '#f5f5f5',
+          color: '#1a1917',
           fontSize: '24px',
-          fontFamily: "'JetBrains Mono', monospace",
+          fontFamily: "'DM Mono', monospace",
         },
       },
     },
   };
 
+  const formatTime = (timestamp: string) => {
+    return new Date(timestamp).toLocaleTimeString('zh-CN', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+  };
+
+  const getAgentClass = (agent: string | undefined): string => {
+    if (!agent) return 'system';
+    const map: Record<string, string> = {
+      'WP1-1': 'wp1-1',
+      'WP1-2': 'wp1-2',
+      'WP1-3': 'wp1-3',
+      'WP1-4': 'wp1-4',
+      'System': 'system',
+    };
+    return map[agent] || 'system';
+  };
+
   return (
-    <div className="fade-in" style={{ background: 'var(--dashboard-bg-primary)', minHeight: '100vh', padding: '24px' }}>
+    <div className="dashboard-page dash-fade-in">
       {/* 页面标题 */}
-      <div style={{ marginBottom: 32 }}>
-        <Space align="center" size={12}>
-          <ThunderboltOutlined style={{ fontSize: 24, color: 'var(--dashboard-accent)' }} />
-          <Title
-            level={3}
-            style={{
-              margin: 0,
-              color: '#f5f5f5',
-              fontFamily: "'Playfair Display', serif",
-            }}
-          >
-            系统总览
-          </Title>
-        </Space>
-        <div style={{ marginTop: 8, marginLeft: 36 }}>
-          <TypewriterText
-            text="多智能体大模型安全态势感知与自动化防御系统运行状态"
-            speed={25}
-            className="text-secondary"
-          />
+      <div className="dashboard-header">
+        <div className="dashboard-title">
+          <ThunderboltOutlined className="dashboard-title-icon" />
+          <h3>系统总览</h3>
+        </div>
+        <div className="dashboard-subtitle">
+          多智能体大模型安全态势感知与自动化防御系统运行状态
         </div>
       </div>
 
       {/* 四个子系统核心指标 */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={24} sm={12} lg={6}>
-          <StatCard
-            title="WP1-1 攻击技术池"
-            value={attackStats?.total || 0}
-            suffix="个"
-            icon={<RadarChartOutlined />}
-            color="#6366f1"
-            glowColor="primary"
-            trend={{ value: 12, isUp: true }}
-          />
+          <div className="dash-stat-card" style={{ '--card-accent': '#cc4e1e' } as React.CSSProperties}>
+            <div className="dash-stat-title">
+              <RadarChartOutlined style={{ marginRight: 6 }} />
+              WP1-1 攻击技术池
+            </div>
+            <div className="dash-stat-value">
+              {attackStats?.total || 0}
+              <span className="dash-stat-suffix">个</span>
+            </div>
+            <div className="dash-stat-trend up">
+              <ArrowUpOutlined /> +12%
+            </div>
+          </div>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <StatCard
-            title="WP1-2 确认漏洞"
-            value={vulnStats?.confirmed || 0}
-            suffix={`/ ${vulnStats?.total || 0}`}
-            icon={<BugOutlined />}
-            color="#ef4444"
-            glowColor="danger"
-            trend={{ value: 8, isUp: true }}
-          />
+          <div className="dash-stat-card" style={{ '--card-accent': '#b91c1c' } as React.CSSProperties}>
+            <div className="dash-stat-title">
+              <BugOutlined style={{ marginRight: 6 }} />
+              WP1-2 确认漏洞
+            </div>
+            <div className="dash-stat-value">
+              {vulnStats?.confirmed || 0}
+              <span className="dash-stat-suffix">/ {vulnStats?.total || 0}</span>
+            </div>
+            <div className="dash-stat-trend up">
+              <ArrowUpOutlined /> +8%
+            </div>
+          </div>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <StatCard
-            title="WP1-3 标注样本"
-            value={sandboxStats?.total_samples || 0}
-            suffix="条"
-            icon={<ExperimentOutlined />}
-            color="#a855f7"
-            glowColor="primary"
-          />
+          <div className="dash-stat-card" style={{ '--card-accent': '#c4860a' } as React.CSSProperties}>
+            <div className="dash-stat-title">
+              <ExperimentOutlined style={{ marginRight: 6 }} />
+              WP1-3 标注样本
+            </div>
+            <div className="dash-stat-value">
+              {sandboxStats?.total_samples || 0}
+              <span className="dash-stat-suffix">条</span>
+            </div>
+          </div>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <StatCard
-            title="WP1-4 已部署模型"
-            value={idsStats?.deployed_models || 0}
-            suffix="个"
-            icon={<SafetyCertificateOutlined />}
-            color="#10b981"
-            glowColor="success"
-          />
+          <div className="dash-stat-card" style={{ '--card-accent': '#2d6a4f' } as React.CSSProperties}>
+            <div className="dash-stat-title">
+              <SafetyCertificateOutlined style={{ marginRight: 6 }} />
+              WP1-4 已部署模型
+            </div>
+            <div className="dash-stat-value">
+              {idsStats?.deployed_models || 0}
+              <span className="dash-stat-suffix">个</span>
+            </div>
+          </div>
         </Col>
       </Row>
 
       {/* 实时日志流 */}
-      <GlowCard
-        title={
-          <Space>
-            <span className="status-indicator active" />
-            <Text style={{ color: '#f5f5f5', fontFamily: "'JetBrains Mono', monospace" }}>
-              实时日志流
-            </Text>
-          </Space>
-        }
-        style={{ marginBottom: 24 }}
-        loading={loading}
-      >
-        <LogStream logs={logs} maxHeight={200} />
-      </GlowCard>
+      <div className="dash-panel" style={{ marginBottom: 24 }}>
+        <div className="dash-panel-header">
+          <div className="dash-panel-title">
+            <span className="dash-status-dot active" />
+            实时日志流
+          </div>
+        </div>
+        <div className="dash-panel-body">
+          <div className="dash-log-feed">
+            {logs.map(log => (
+              <div key={log.id} className="dash-log-entry">
+                <span className="dash-log-timestamp">{formatTime(log.timestamp)}</span>
+                <span className={`dash-log-agent ${getAgentClass(log.agent)}`}>{log.agent}</span>
+                <span className={`dash-log-level ${log.level}`}>{log.level}</span>
+                <span className="dash-log-message">{log.message}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* Pipeline 状态 */}
-      <GlowCard
-        title={
-          <Text style={{ color: '#f5f5f5' }}>流水线状态</Text>
-        }
-        extra={
-          <Button
-            type="primary"
-            icon={<RocketOutlined />}
-            loading={triggering}
-            onClick={handleTriggerPipeline}
-            style={{
-              background: 'linear-gradient(135deg, var(--dashboard-accent) 0%, var(--dashboard-accent-light) 100%)',
-              border: 'none',
-              boxShadow: '0 0 20px var(--dashboard-glow)',
-            }}
-          >
-            触发运行
-          </Button>
-        }
-        style={{ marginBottom: 24 }}
-        loading={loading}
-      >
-        <Steps
-          current={pipelineStatus?.stages.findIndex(s => s.status === 'running') ?? -1}
-          items={pipelineStatus?.stages.map(stage => ({
-            title: (
-              <Text style={{ color: '#f5f5f5', fontSize: 13 }}>{stage.name}</Text>
-            ),
-            status: getStepStatus(stage.status),
-            icon: getStepIcon(stage.status),
-            description: (
-              <Text style={{ color: '#737373', fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}>
-                {stage.status === 'completed'
-                  ? `完成于 ${new Date(stage.completed_at!).toLocaleTimeString()}`
-                  : stage.status === 'running'
-                  ? `进度 ${stage.progress}%`
-                  : '等待中'}
-              </Text>
-            ),
-          })) || []}
-        />
-        <div style={{ marginTop: 20, textAlign: 'center' }}>
-          <Text style={{ color: '#525252', fontSize: 12, fontFamily: "'JetBrains Mono', monospace" }}>
+      <div className="dash-panel" style={{ marginBottom: 24 }}>
+        <div className="dash-panel-header">
+          <div className="dash-panel-title">
+            <RocketOutlined className="dash-panel-title-icon" />
+            流水线状态
+          </div>
+          <div className="dash-panel-extra">
+            <button
+              className="dash-btn-primary"
+              onClick={handleTriggerPipeline}
+              disabled={triggering}
+            >
+              {triggering ? <SyncOutlined spin style={{ marginRight: 6 }} /> : <RocketOutlined style={{ marginRight: 6 }} />}
+              触发运行
+            </button>
+          </div>
+        </div>
+        <div className="dash-panel-body">
+          <div className="dash-pipeline">
+            {pipelineStatus?.stages.map((stage, index) => (
+              <React.Fragment key={stage.name}>
+                <div className={`dash-pipeline-node ${getStepStatus(stage.status)}`}>
+                  <div className="dash-pipeline-icon">
+                    {getStepIcon(stage.status)}
+                  </div>
+                  <div className="dash-pipeline-label">{stage.name}</div>
+                  <div className="dash-pipeline-status">
+                    {stage.status === 'completed' && stage.completed_at
+                      ? `完成于 ${new Date(stage.completed_at).toLocaleTimeString()}`
+                      : stage.status === 'running'
+                        ? `进度 ${stage.progress}%`
+                        : '等待中'}
+                  </div>
+                </div>
+                {index < pipelineStatus.stages.length - 1 && (
+                  <div className="dash-pipeline-arrow" />
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+          <div style={{ marginTop: 16, textAlign: 'center', fontSize: 12, color: '#b0ada8', fontFamily: "'DM Mono', monospace" }}>
             上次运行: {pipelineStatus?.last_run ? new Date(pipelineStatus.last_run).toLocaleString() : '-'}
             {' | '}
             累计运行: {pipelineStatus?.total_runs || 0} 次
-          </Text>
+          </div>
         </div>
-      </GlowCard>
+      </div>
 
       {/* 数据可视化 */}
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={12}>
-          <GlowCard
-            title={<Text style={{ color: '#f5f5f5' }}>攻击技术类别分布</Text>}
-            loading={loading}
-          >
-            {categoryData.length > 0 && <Column {...categoryConfig} height={300} />}
-          </GlowCard>
+          <div className="dash-panel">
+            <div className="dash-panel-header">
+              <div className="dash-panel-title">攻击技术类别分布</div>
+            </div>
+            <div className="dash-panel-body">
+              <div className="dash-chart-container">
+                {categoryData.length > 0 && <Column {...categoryConfig} height={300} />}
+              </div>
+            </div>
+          </div>
         </Col>
         <Col xs={24} lg={12}>
-          <GlowCard
-            title={<Text style={{ color: '#f5f5f5' }}>漏洞严重级别分布</Text>}
-            loading={loading}
-          >
-            {severityData.length > 0 && <Pie {...severityConfig} height={300} />}
-          </GlowCard>
+          <div className="dash-panel">
+            <div className="dash-panel-header">
+              <div className="dash-panel-title">漏洞严重级别分布</div>
+            </div>
+            <div className="dash-panel-body">
+              <div className="dash-chart-container">
+                {severityData.length > 0 ? (
+                  <Pie {...severityConfig} height={300} />
+                ) : (
+                  <div style={{ textAlign: 'center', padding: '40px', color: '#7a7774' }}>
+                    正在加载漏洞数据...
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </Col>
       </Row>
 
       {/* OWASP LLM Top 10 覆盖率 */}
-      <GlowCard
-        title={<Text style={{ color: '#f5f5f5' }}>OWASP LLM Top 10 覆盖率</Text>}
-        style={{ marginTop: 16 }}
-        loading={loading}
-      >
-        <Row gutter={[16, 16]}>
-          {vulnStats?.owasp_coverage.map((item, index) => (
-            <Col xs={24} sm={12} lg={8} xl={6} key={index}>
-              <Tooltip title={item.category}>
-                <div
-                  className="lift-on-hover"
-                  style={{
-                    padding: '16px',
-                    background: 'var(--dashboard-bg-elevated)',
-                    border: '1px solid var(--dashboard-border)',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <Text
-                    ellipsis
-                    style={{
-                      color: '#a3a3a3',
-                      fontSize: 12,
-                      display: 'block',
-                      marginBottom: 8,
-                    }}
-                  >
-                    {item.category}
-                  </Text>
-                  <Progress
-                    percent={Math.round((item.covered / item.total) * 100)}
-                    format={() => (
-                      <span style={{ color: '#f5f5f5', fontFamily: "'JetBrains Mono', monospace", fontSize: 12 }}>
-                        {item.covered}/{item.total}
-                      </span>
-                    )}
-                    strokeColor={
-                      item.covered / item.total >= 0.8
-                        ? '#10b981'
-                        : item.covered / item.total >= 0.5
-                        ? '#7BA4D4'
-                        : '#ef4444'
-                    }
-                    trailColor="var(--dashboard-border)"
-                  />
-                </div>
-              </Tooltip>
-            </Col>
-          ))}
-        </Row>
-      </GlowCard>
-
-      {/* 全局样式覆盖 */}
-      <style>{`
-        .text-secondary {
-          color: #a3a3a3;
-          font-size: 14px;
-        }
-        
-        /* Steps 样式覆盖 */
-        .ant-steps .ant-steps-item-title {
-          color: #f5f5f5 !important;
-        }
-        .ant-steps .ant-steps-item-description {
-          color: #737373 !important;
-        }
-        .ant-steps .ant-steps-item-tail::after {
-          background: var(--dashboard-border) !important;
-        }
-        .ant-steps .ant-steps-item-process .ant-steps-item-tail::after {
-          background: linear-gradient(90deg, var(--dashboard-accent) 0%, var(--dashboard-border) 100%) !important;
-        }
-        
-        /* Progress 样式覆盖 */
-        .ant-progress-text {
-          color: #f5f5f5 !important;
-        }
-        
-        /* Card loading 样式 */
-        .ant-card-loading-content {
-          background: linear-gradient(90deg, var(--dashboard-bg-secondary) 25%, var(--dashboard-bg-tertiary) 50%, var(--dashboard-bg-secondary) 75%);
-          background-size: 200% 100%;
-          animation: loading 1.5s infinite;
-        }
-        
-        @keyframes loading {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-      `}</style>
+      <div className="dash-panel" style={{ marginTop: 16 }}>
+        <div className="dash-panel-header">
+          <div className="dash-panel-title">OWASP LLM Top 10 覆盖率</div>
+        </div>
+        <div className="dash-panel-body">
+          <Row gutter={[16, 16]}>
+            {vulnStats?.owasp_coverage.map((item, index) => (
+              <Col xs={24} sm={12} lg={8} xl={6} key={index}>
+                <Tooltip title={item.category}>
+                  <div className="dash-coverage-item">
+                    <span className="dash-coverage-label">{item.category}</span>
+                    <Progress
+                      percent={Math.round((item.covered / item.total) * 100)}
+                      format={() => (
+                        <span style={{ color: '#1a1917', fontFamily: "'DM Mono', monospace", fontSize: 12 }}>
+                          {item.covered}/{item.total}
+                        </span>
+                      )}
+                      strokeColor={
+                        item.covered / item.total >= 0.8
+                          ? '#2d6a4f'
+                          : item.covered / item.total >= 0.5
+                            ? '#c4860a'
+                            : '#b91c1c'
+                      }
+                      trailColor="#f2f0ec"
+                    />
+                  </div>
+                </Tooltip>
+              </Col>
+            ))}
+          </Row>
+        </div>
+      </div>
     </div>
   );
 };

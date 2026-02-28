@@ -398,8 +398,10 @@ const HomePage: React.FC = () => {
         </div>
       </div>
 
+
       {/* Four Agent System Visualization */}
       <FourAgentSystem />
+
 
       {/* ==================== Attack Showcase - Live Simulation ==================== */}
       <AttackShowcase />
