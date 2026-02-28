@@ -40,34 +40,28 @@
 .attack-hero {
   position: relative;
   z-index: 1;
-  background: var(--warm-white);
+  background: var(--bg-primary);
   border-bottom: 1px solid var(--border);
   padding: 100px 0 80px;
   overflow: hidden;
-  min-height: 100vh;
+  min-height: 100vh; /* 这里控制高度 */
 }
 
-.attack-hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image: linear-gradient(rgba(60, 50, 40, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(60, 50, 40, 0.04) 1px, transparent 1px);
-  background-size: 48px 48px;
-  mask-image: radial-gradient(ellipse 80% 90% at 50% 50%, black, transparent);
-}
 
 .ah-inner {
   max-width: 1160px;
   margin: 0 auto;
   padding: 0 64px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── Header Content ── */
 .ah-header {
   text-align: center;
-  margin-bottom: 64px;
+  margin-bottom: 40px;
+  flex-shrink: 0;
 }
 
 .reveal {
@@ -964,9 +958,11 @@
 .attack-stage {
   display: grid;
   grid-template-columns: 1fr 1.15fr;
-  gap: 28px;
+  gap: 24px;
   align-items: start;
-  margin-bottom: 52px;
+  margin-bottom: 32px;
+  flex: 1;
+  min-height: 0;
 }
 
 /* ── NEXT STEP BUTTON ── */
@@ -975,7 +971,8 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  margin-top: 36px;
+  margin-top: 24px;
+  flex-shrink: 0;
 }
 
 .ah-nav-btn {
@@ -992,6 +989,8 @@
   align-items: center;
   gap: 7px;
   transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  line-height: 1;
+  padding-bottom: 12px;
 }
 
 .ah-nav-btn:hover {

@@ -7,7 +7,7 @@ import {
   ArrowRightOutlined,
   GithubOutlined,
 } from '@ant-design/icons';
-import { FourAgentSystem, AttackShowcase } from './components';
+import { AttackShowcase, AgentDashboard } from './components';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -349,58 +349,11 @@ const HomePage: React.FC = () => {
 
       </div>
 
-      {/* ==================== Architecture Section ==================== */}
-      <div style={{ padding: '60px 50px 60px', background: 'var(--bg-primary)' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <div
-            ref={(el) => registerElement(el, 'arch-title')}
-            className={`scroll-animate ${visibleElements.has('arch-title') ? 'visible' : ''}`}
-            style={{ textAlign: 'center', marginBottom: 30 }}
-          >
-            {/* 顶部小标签 */}
-            <div style={{ 
-              color: 'var(--color-primary)', 
-              fontSize: 12, 
-              fontWeight: 600, 
-              letterSpacing: '0.1em',
-              marginBottom: 24,
-              fontFamily: 'var(--font-sans)',
-              textTransform: 'uppercase'
-            }}>
-              AI SECURITY · AGENTIC PLATFORM
-            </div>
-            
-            {/* 主标题 - 四智能体闭环协同 */}
-            <Title level={1} style={{ 
-              marginBottom: 32, 
-              fontSize: 56,
-              fontWeight: 700,
-              lineHeight: 1.2,
-            }}>
-              <span style={{ color: 'var(--text-primary)' }}>四智能体</span>
-              <span style={{ color: 'var(--color-primary)', fontStyle: 'italic' }}>闭环协同</span>
-            </Title>
-            
-            {/* 描述文字 */}
-            <Paragraph style={{ 
-              color: 'var(--text-secondary)', 
-              fontSize: 20, 
-              maxWidth: 1000, 
-              margin: '0 auto',
-              lineHeight: 1.8,
-              fontWeight: 400,
-              letterSpacing: '0.02em',
-              whiteSpace: 'nowrap'
-            }}>
-              情报、测试、沙盒、检测——四个自治智能体围绕中央知识库持续协作，构建攻防一体的自进化安全闭环
-            </Paragraph>
-          </div>
-        </div>
-      </div>
+
+      {/* ====================Agent Dashboard ==================== */}
+      <AgentDashboard />
 
 
-      {/* Four Agent System Visualization */}
-      <FourAgentSystem />
 
 
       {/* ==================== Attack Showcase - Live Simulation ==================== */}
