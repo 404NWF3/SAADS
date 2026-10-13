@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import './AgentDashboard.css';
+import './Agentdashboard.css';
 
 // ─── 类型定义 ───────────────────────────────────────────────────────────────────
 interface AgentData {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Row,
   Col,
@@ -12,6 +12,8 @@ import {
   Input,
   Select,
   Tooltip,
+  Alert,
+  message,
 } from 'antd';
 import {
   RadarChartOutlined,
@@ -26,7 +28,7 @@ import {
   ArrowUpOutlined,
 } from '@ant-design/icons';
 import { Line, Pie } from '@ant-design/charts';
-import { attackPoolApi } from '../../../services/api';
+import { intelApi } from '../../../services/intelApi';
 import type { AttackEntry, AttackPoolStats } from '../../../types';
 import type { ColumnsType } from 'antd/es/table';
 import '../dashboard.css';
@@ -42,23 +44,48 @@ const WP1Dashboard: React.FC = () => {
   const [searchText, setSearchText] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [attackList, attackStats] = await Promise.all([
-          attackPoolApi.getList(),
-          attackPoolApi.getStats(),
-        ]);
-        setAttacks(attackList);
-        setStats(attackStats);
-      } catch (error) {
-        console.error('Failed to fetch data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+  const [error, setError] = useState<string | null>(null);
+  const [collecting, setCollecting] = useState(false);
+  const [latestRun, setLatestRun] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { attacks: attackList, stats: attackStats, raw } = await intelApi.getAttackPool();
+      setAttacks(attackList);
+      setStats(attackStats);
+      setLatestRun(raw.latest_run ? `${raw.latest_run.run_id} · ${raw.latest_run.saved_at}` : null);
+    } catch (err) {
+      console.error('Failed to fetch data:', err);
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleCollect = async () => {
+    setCollecting(true);
+    try {
+      await intelApi.triggerCollect({ mode: 'incremental', max_rounds: 1, max_api_calls: 4 });
+      message.info('情报采集任务已启动（规则模式/LLM 模式取决于后端配置）');
+      for (let i = 0; i < 120; i++) {
+        await new Promise(r => setTimeout(r, 5000));
+        const job = await intelApi.getCollectStatus();
+        if (job.status === 'succeeded') { message.success(`采集完成，本轮 ${job.items ?? 0} 条`); break; }
+        if (job.status === 'failed') { message.error(`采集失败: ${job.error}`); break; }
+      }
+      await fetchData();
+    } catch (err) {
+      message.error(err instanceof Error ? err.message : '触发采集失败');
+    } finally {
+      setCollecting(false);
+    }
+  };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -392,6 +419,22 @@ const WP1Dashboard: React.FC = () => {
         </div>
       </div>
 
+      {error && (
+        <Alert
+          type="error"
+          showIcon
+          style={{ marginBottom: 16 }}
+          message="无法连接情报采集后端 (LLM-Intel-Auto)"
+          description={error}
+          action={<Button size="small" onClick={fetchData}>重试</Button>}
+        />
+      )}
+      {latestRun && !error && (
+        <div className="dashboard-subtitle" style={{ marginBottom: 12 }}>
+          数据来源：LLM-Intel-Auto · 最近运行 {latestRun}
+        </div>
+      )}
+
       {/* 统计卡片 */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={12} sm={6}>
@@ -480,6 +523,10 @@ const WP1Dashboard: React.FC = () => {
           </div>
           <div className="dash-panel-extra">
             <Space>
+              <Button icon={<SyncOutlined spin={collecting} />} loading={collecting} onClick={handleCollect}>
+                触发增量采集
+              </Button>
+              <Button onClick={fetchData} disabled={loading}>刷新</Button>
               <Input
                 placeholder="搜索 ID 或名称"
                 prefix={<SearchOutlined style={{ color: 'var(--dash-ink-dim)' }} />}

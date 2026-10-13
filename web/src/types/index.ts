@@ -226,3 +226,34 @@ export interface PipelineStatus {
   last_run: string;
   total_runs: number;
 }
+
+// ==================== WP1-1 情报采集后端 (LLM-Intel-Auto) ====================
+export interface IntelItem {
+  item_id: string;
+  source_name: string;
+  source_uri: string | null;
+  title: string | null;
+  summary: string | null;
+  published_at: string | null;
+  fetched_at: string | null;
+  relevance_score: number;
+  topics: string[];
+  severity: string | null;
+}
+
+export interface IntelStats {
+  total: number;
+  by_source: Record<string, number>;
+  by_topic: Record<string, number>;
+  fetch_trend: { date: string; count: number }[];
+  latest_run: { run_id: string; status: string; saved_at: string; raw_items: number; rounds: number } | null;
+}
+
+export interface IntelCollectJob {
+  status: 'idle' | 'running' | 'succeeded' | 'failed';
+  run_id?: string;
+  items?: number;
+  error?: string;
+  started_at?: string;
+  finished_at?: string;
+}
